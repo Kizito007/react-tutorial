@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import "../index.css";
 // import CheckList from "./CheckList";
 // import Card from "./Card";
@@ -11,7 +11,11 @@ import "../index.css";
 // import Product from "./Product";
 // import productData from "./vschoolProducts";
 // import Conditional from "./Conditional";
-import Form from "./FormContainer";
+
+import userList from "./UserData";
+import UserTable from "./UserTable";
+import AddUserForm from "./AddUserForm";
+import EditUserForm from "./EditUser";
 
 // function App(){
     
@@ -415,8 +419,55 @@ import Form from "./FormContainer";
 //             </form>
 //         )
 //     }
-// }
+// }< Form/>
 
-const App = () => (< Form/>)
+const App = () => {
+
+    const [users, setUsers] = useState(userList);
+    const [editing, setEditing] = useState(false);
+
+    const initialUser = {id: null, name: "", username: ""}
+    const [currentUser, setCurrentUser] = useState(initialUser);
+
+    const addUser = user => {
+        user.id = users.length + 1;
+        setUsers([...users, user])
+    }
+    const editUser = (id, user) => {
+        setEditing(true);
+        setCurrentUser(user);
+    }
+    const updateUser = (newUser) => {
+        setUsers(users.map(user => (user.id === currentUser.id ? newUser : user)))
+    }
+    const deleteUser = id => setUsers(users.filter(user => user.id !== id));
+
+    return (
+        <div>
+            <h1>React CRUD App with Hooks</h1>
+            {
+                editing ? (
+                    <div>
+                        <h2>Edit User</h2>
+                        <EditUserForm
+                            currentUser={currentUser}
+                            setEditing={setEditing}
+                            updateUser={updateUser}
+                        />
+                    </div>
+                ) : (
+                    <div>
+                        <h2>Add User</h2>
+                        <AddUserForm addUser={addUser} />
+                    </div>
+                )
+            }
+            <div>
+                <h2>View Users</h2>
+                <UserTable users={users} deleteUser={deleteUser} editUser={editUser} />
+            </div>
+        </div>
+    )
+}
 
 export default App;
